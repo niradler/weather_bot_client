@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Weather Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+    <style>
+        body {
+            background-color: azure;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="botui-app-container" id="botui-app">
+        <bot-ui></bot-ui>
+    </div>
+    <script src="https://cdn.jsdelivr.net/vue/latest/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/botui/build/botui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.17.1/axios.min.js"></script>
+    <script>
+        var botui = new BotUI('botui-app');
+
+        function askAndRes() {
+            botui.action.text({
+                action: {
+                    placeholder: 'weather in new york'
+                }
+            }).then(function (res) { // will be called when it is submitted.
+                console.log(res.value); // will print whatever was typed in the field.
+                axios({
+                    method: 'post',
+                    url: 'https://us-central1-newagent-f0f9d.cloudfunctions.net/bot',
+                    data: {
+                        msg: res.value,
+                    }
+                }).then((r) => {
+
+                    botui.message.add({
+                        content: r.data.result.fulfillment.speech
+                    }).then(function () { // wait till previous message has been shown.
+                        askAndRes()
+
+                    });
+                });
+            });
+        }
+        botui.message.add({
+            content: 'Ask me about the weather!'
+        }).then(function () { // wait till previous message has been shown.
+            askAndRes()
+
+        });
+    </script>
+</body>
+
+</html>
