@@ -11,10 +11,23 @@
         body {
             background-color: azure;
         }
+
+        .center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
+    <div class="center">
+        <div>
+        Weather Service Status :
+        <span id="status">Not Tested!</span>
+    </div>
+    </div>
     <div class="botui-app-container" id="botui-app">
         <bot-ui></bot-ui>
     </div>
@@ -38,7 +51,15 @@
                         msg: res.value,
                     }
                 }).then((r) => {
-
+                    const is_web_hook = r.data.status.code === 200 ? true : false;
+                    const el = document.getElementById('status');
+                    if (is_web_hook) {
+                        el.style.color = 'green';
+                        el.innerHTML = 'OK!'
+                    } else {
+                        el.style.color = 'red';
+                        `NOT OK! (${r.data.status.code})`
+                    }
                     botui.message.add({
                         content: r.data.result.fulfillment.speech
                     }).then(function () { // wait till previous message has been shown.
